@@ -6,12 +6,14 @@ This project uses STM32CubeIDE and it's a program created to practice my C habil
 
 ## code
 
-## Debugging
+## debugging with ITM
+
+1. Is necessary to configurate the debugging option by:
 
 ![image](https://user-images.githubusercontent.com/58916022/210183330-324c8dc0-5b79-4211-a9c2-acfccf8e56f7.png)
 
 
-## ITM code (syscalls.c)
+2. Add the ITM code (syscalls.c)
 
 Go to syscalls.c file and copy the following code from [niekiran](https://github.com/niekiran/Embedded-C/blob/master/All_source_codes/target/itm_send_data.c) just bellow the #include's.  
 
@@ -58,8 +60,31 @@ void ITM_SendChar(uint8_t ch)
 	ITM_STIMULUS_PORT0 = ch;
 }
 ```
+3. Add the SWV ITM Data Console
 
-## Other errors during compilation
+Switch to the debbuging view, and go to 'Window'-> 'Show View' -> 'SWV' and selecte the option 'SWV ITM Data Console'.
+
+![image](https://user-images.githubusercontent.com/58916022/210184296-7699f2d9-f10b-41b1-8af4-a03667e0b147.png)
+
+Click in the 'Configure trace' button.
+
+![image](https://user-images.githubusercontent.com/58916022/210184332-15a6e00f-d8d3-4015-93a3-12562ccffa84.png)
+
+Select the 'ITM Stimulus Port' number 0 and click 'OK'.
+
+![image](https://user-images.githubusercontent.com/58916022/210184356-51f9900f-0826-455f-ae0e-56e789e3b216.png)
+
+Click in the 'Start trace' button and if needed 'Terminate and Relaunch'.
+
+![image](https://user-images.githubusercontent.com/58916022/210184378-c45514fd-6701-4380-bec0-08c2da2bfca8.png)
+
+Now, the *printf* messages will appear at the console:
+
+![image](https://user-images.githubusercontent.com/58916022/210184405-eddd21ed-6ce9-4ed9-bead-5176f25cbb01.png)
+
+## Other errors during compilation/debugging
 
 1: ![image](https://user-images.githubusercontent.com/58916022/210183921-83712f20-6c47-4459-8f87-f8a49519ab7c.png)
+
+It alto wans't programming the MCU. I disconnected all the cables to RTC and then it worked.
 
