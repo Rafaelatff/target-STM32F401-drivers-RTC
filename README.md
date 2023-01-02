@@ -163,10 +163,23 @@ The *ds1307_read* function, is a local/helper function. It writes the register a
 The function *ds1307_get_current_time* works similarly, but also with a few complexity due to the time format (12h or 24h, AM or PM).
 
 ![image](https://user-images.githubusercontent.com/58916022/210266556-602724a2-c19f-43e3-bd1a-668ba8feabc7.png)
-
-
 	
-## user code
+## user code 010rtc-lcd.c
+	
+The initial code is really simple. We create two variables to hold current time and current date information. Then We use the ITM monitor to help during debug of code and we initialize the ds1307. We also initialize the systick timer and configure it to generate 1 interrupt per second.
+	
+![image](https://user-images.githubusercontent.com/58916022/210270157-27a3c48d-aaf8-42f1-9f82-0854ccbd272f.png)
+
+We atribute some values to the variables that holds current date and current time and write those values inside DS1307.
+	
+![image](https://user-images.githubusercontent.com/58916022/210270223-2fc9d2be-7036-487f-baad-6faef36d6555.png)
+
+Then we get those values from the DS1307. To print those values in ITM terminal, we use the *printf* function with some helper/local functions.
+	
+![image](https://user-images.githubusercontent.com/58916022/210270339-200cbc01-cc2a-4ae9-911d-ded31416db6a.png)
+
+The 	
+
 
 ## debugging with ITM
 
