@@ -150,8 +150,22 @@ The function *ds1307_set_current_time* is a little bit more complicated, once it
 
 ![image](https://user-images.githubusercontent.com/58916022/210265546-d098793c-65b1-4dfd-b293-044a20fe55cc.png)
 
+Now the get functions, starting by the *ds1307_get_current_date*.
+	
+![image](https://user-images.githubusercontent.com/58916022/210266079-e8afbaba-b7ae-4301-bbd3-218f92ec5aa1.png)
+
+This functions receives the value of ds1307_read and converts to its integer value (the received value is in BCD format).
+
+The *ds1307_read* function, is a local/helper function. It writes the register address that will be read by using the *I2C_MasterSendData* function and then read the received value from the slave by the *I2C_MasterReceiveData*. Note that this function will read only 1 byte.
+	
+![image](https://user-images.githubusercontent.com/58916022/210266250-21feb0a2-8712-4f54-a76f-59664a8303b2.png)
+
+The function *ds1307_get_current_time* works similarly, but also with a few complexity due to the time format (12h or 24h, AM or PM).
+
+![image](https://user-images.githubusercontent.com/58916022/210266556-602724a2-c19f-43e3-bd1a-668ba8feabc7.png)
 
 
+	
 ## user code
 
 ## debugging with ITM
