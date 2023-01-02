@@ -134,10 +134,21 @@ We enable the clock for the I2C peripheral and then clear the bit CH of DS1307. 
 
 ![image](https://user-images.githubusercontent.com/58916022/210264805-10a61a1f-2a88-4943-ad31-6dadc434ae48.png)
 
-This function receives the register address (uint8_t reg_addr) and the value that must be write (uint8_t value). The function that sends it by the I2C is the *I2C_MasterSendData(&<I2C_Handle_t variable name>, <register address and data>, <number of bytes to be written>, <slave address>, <repeated start>).
+This function receives the register address (uint8_t reg_addr) and the value that must be write (uint8_t value). The function that sends it by the I2C is the *I2C_MasterSendData(&<I2C_Handle_t variable name>, <register address and data>, <number of bytes to be written>, <slave address>, <repeated start>)*.
 
+We have then, the functions to set date and time and the functions to get current date and time. Lets start by the *ds1307_set_current_date*.
 
+The *ds1307_set_current_date* function simply uses the ds1307 function to write inside the register addresses of the DS1307. Note that we have the register address represented as macros already and the value is the returned result of the functions *binary_to_bcd*.
+	
+![image](https://user-images.githubusercontent.com/58916022/210265384-56887792-783e-4fe6-8784-38847a755684.png)
 
+The function *ds1307_set_current_time* is a little bit more complicated, once it needs to:
+
+	1. Write the seconds but garantee that the CH bit won't be alterated;
+	2. Write the minutes;
+	3. White the hours, but need to check the time format (12H or 24H) and also need to check if is AM or PM.
+
+![image](https://user-images.githubusercontent.com/58916022/210265546-d098793c-65b1-4dfd-b293-044a20fe55cc.png)
 
 
 
