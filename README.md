@@ -3,8 +3,70 @@ This project uses STM32CubeIDE and it's a program created to practice my C habil
 
 ## challenge
 
+Create a BSP (board support package) to communicate with the RTC board (model Tiny RTC I2C modules) that uses the IC DS1307. 
 
-## code
+![RTC](https://user-images.githubusercontent.com/58916022/210247290-eae4c12d-ea3f-4e45-b999-0500a2d25f5a.jpeg)
+
+*About the RTC* (some info were collected from datasheet)
+
+![image](https://user-images.githubusercontent.com/58916022/210247891-a66752e5-ea74-4f41-b138-5c4e226b9804.png)
+
+- The DS1307 Serial Real-Time Clock is a low-power, full binary-coded decimal (BCD) clock/calendar plus 56 bytes of NV SRAM.
+
+- The DS1307 operates as a slave device on the serial bus. DS1307 address is 1101000 (0x68).
+
+- The RTC registers are located in address locations 00h to 07h.
+
+- The RAM registers are located in address locations 08h to 3Fh.
+
+Since the RTC uses BCD code, we need two functions. One to convert the binary number (integer) to its value in BCD format, so we can configure the initial time for RTC and another code to convert the readed BCD value to its decimal.
+
+The fist code is showed next (binary to BCD):
+
+```
+static uint8_t binary_to_bcd(uint8_t value){
+	uint8_t m,n, bcd;
+	bcd = value;
+	if(value >= 10){
+		m = value/10;
+		n = value %10;
+		bcd = (uint8_t)((m<<4) |n);
+	}
+	return bcd;
+}
+```
+The code above, receives a **value** with uint8_t type that represents a binary integer value (0 to 255). Then, if the value is less than 10, it just return the same value (in this case, binary value and bcd are the same). For values bigger than 10 we need to separe the digits and then convert the digits to hexadecimal.
+
+If the value is bigger (or equal to 10), **m** receives the decimal place (second order digit) of **value** by having **value** divided by 10. 
+
+Then **n** receives the remainder of the integer divission of **value** by 10. This is done by using the modulo operator (%). In **n** we have the first order digit separeted.
+
+Ten, **bcd**, that is a 8 bits value, receives in its most significant nibble the **m** value (m<<4) and **n** in its low significant nibble (|n). 
+
+Now the code for BCD to decimal:
+
+```
+static uint8_t bcd_to_binary(uint8_t value){
+	uint8_t m,n, binary;
+	m = (uint8_t)((value>>4) * 10);
+	n = value & (uint8_t)0x0F;
+	binary = m + n;
+	return binary;
+}
+```
+To convert the bcd code to binary, we need to separed the most significant nibble (that represents the second order digit) from the less signficant nibble (that represents the first order digit).
+
+The **m** receveis the **value** after shiffted 4 positions, so the second order digit becomes a first order digit and then we multiply its result by 10. We have a real value that represents the second order digit digit.
+
+PAREI AQUI
+
+Note tha both code are helper (local) functions of the bsp code for the ds1307 RTC. Both are declared at the top of the 'ds1307.c' file.
+
+## bsp code
+
+
+
+## user code
 
 ## debugging with ITM
 
@@ -81,6 +143,21 @@ Click in the 'Start trace' button and if needed 'Terminate and Relaunch'.
 Now, the *printf* messages will appear at the console:
 
 ![image](https://user-images.githubusercontent.com/58916022/210184405-eddd21ed-6ce9-4ed9-bead-5176f25cbb01.png)
+
+And also the code after debugging both lines:
+
+```
+	ds1307_get_current_date(&current_date);
+	ds1307_get_current_time(&current_time);	
+```
+And the result:
+
+![image](https://user-images.githubusercontent.com/58916022/210245688-8ec5bdfc-9c4a-45ff-9cbe-aee54c23c92b.png)
+
+*Note: The difference between the programmed time and the readed time is because I leave the computer to do a different task, and later (29 minutes later) I returned to my desk and continued to debbuging*
+
+## code in loop
+
 
 ## Other errors during compilation/debugging
 
