@@ -178,8 +178,25 @@ Then we get those values from the DS1307. To print those values in ITM terminal,
 	
 ![image](https://user-images.githubusercontent.com/58916022/210270339-200cbc01-cc2a-4ae9-911d-ded31416db6a.png)
 
-The 	
+The *time_to_string* function fill an array of 9 characters (hh:mm:ss) that will receive the values of type *RTC_time_t*. Position 2 and 5 of the array holds the fix character of ':'.
 
+![image](https://user-images.githubusercontent.com/58916022/210272836-993d6304-ee40-4ed1-955a-317874900e92.png)
+	
+The *time_to_string* function call another helper/local function called *number_to_string*. This function converts the integer number into its value according to the ASCII table. It is possible to see (next image from the [internet](https://www.johndcook.com/blog/2022/05/28/how-to-memorize-the-ascii-table/)) that the ASCII number  is the number plus 48
+
+![image](https://user-images.githubusercontent.com/58916022/210273575-f41264a0-e523-4d9e-812a-041b0e81733e.png)
+
+The code *number_to_string* separates the first digit to the second digit and them convert them to the its ASCII value.
+	
+![image](https://user-images.githubusercontent.com/58916022/210273146-81430779-206b-4db6-8856-7ff6c902fdb6.png)
+	
+The *date_to_string* function is similar to the *time_to_string*.
+	
+![image](https://user-images.githubusercontent.com/58916022/210273822-1ed80807-b48c-4c1f-b75b-902c075a6c1e.png)
+	
+The *get_day_of_week* function is responsable to convert the number in *current_date.day* variable into a string.
+
+![image](https://user-images.githubusercontent.com/58916022/210273896-2ee01182-60a1-4f8a-8da2-0828e2a69b58.png)
 
 ## debugging with ITM
 
