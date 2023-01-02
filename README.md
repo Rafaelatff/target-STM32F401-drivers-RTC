@@ -90,6 +90,57 @@ Those items, are the importantant #include's and #define's that will connect to 
 
 ## bsp code, source file
 
+The first function to be called by the user code is the initialization function. This function must configure the I2C pins to communicate with the RTC and also need to clear the CH (Clock Halt) bit in 0x00 register address.
+
+![image](https://user-images.githubusercontent.com/58916022/210262052-66fd6182-b2f1-4f23-afd3-fb6e1e51e127.png)
+
+After clearing the CH bit, we also read back its value and return it as a result of this function. This way, user code can stop and be held by the following code that init and check (easy to check if there is an error while debbuging):
+
+![image](https://user-images.githubusercontent.com/58916022/210262475-fd0bffcc-d916-40c2-a3ae-dc5931cabb11.png)
+
+The whole code for initialization is presented:
+
+![image](https://user-images.githubusercontent.com/58916022/210261815-e8825388-de4d-43c6-b8e8-cd85419b9fad.png)
+
+We use the *memset* function to clear all the bits of the GPIO_handle variables that we create to configure the GPIO pins. 
+
+- *memset(&<variable name>, <value to be set>, <size of the variable>);*
+
+The first function called inside the *ds1307_init* is the *ds1307_i2c_pin_config*. This function is responsable to configure the GPIO pins of the I2C as Alternate Function and later as I2C. **Note that we used macros inside this function, so if the user wants to change the I2C channel or pins, the user must go to the ds1307.h file and change the macros there!**.
+
+Just two small remembers: 
+
+```
+	i2c_sxx.GPIO_PinConfig.GPIO_PinMode = GPIO_MODE_ALTFN;
+	// This line configure the GPIO as Alternate Function (GPIOx_MODER = 0x2 or 0b10)
+```
+To know which alternate function must be used, the datasheet must be checked. In our case, to use pins PB8 and PB9 (I2C1), the AF04 must be set.
+
+![image](https://user-images.githubusercontent.com/58916022/210263472-6fd12b63-ebca-48b5-9ea3-a59f8b778b83.png)
+
+```
+	i2c_sxx.GPIO_PinConfig.GPIO_PinAltFunMode = 4;
+	// This line chooses the AFx to be used (GPIOx_AFLx = 0x4 or 0b0100)
+```
+Then, the second function called by *ds1307_init* is the *ds1307_i2c_config*. Once the I2C GPIOs are configured, the I2C channel must be configured. That is also a local/helper function. A global variable with type **I2C_Handle_t** with name **g_ds1307I2cHandle** was declared. The *g_* denotes global.
+	
+![image](https://user-images.githubusercontent.com/58916022/210264074-09c62777-07af-481d-805a-289990c3ef1e.png)
+
+We configure the pI2Cx to be the one declared as macro inside the header file (ds1307.h). We enable the acknolodge bit (I guess this line can be deleted, once this bit can be set only after the peripheral is enabled). We also configure the I2C clock speed (using the macro in header file) and call the *I2C_Init* function with the values inside the **g_ds1307I2cHandle**.
+	
+To learn more about the I2C configuration just [click here](https://github.com/Rafaelatff/target-STM32F401-drivers-I2C). The main focus here is the RTC.
+	
+We enable the clock for the I2C peripheral and then clear the bit CH of DS1307. The function that writes commands on the RTC register using the I2C is the *ds1307_write*.
+
+![image](https://user-images.githubusercontent.com/58916022/210264805-10a61a1f-2a88-4943-ad31-6dadc434ae48.png)
+
+This function receives the register address (uint8_t reg_addr) and the value that must be write (uint8_t value). The function that sends it by the I2C is the *I2C_MasterSendData(&<I2C_Handle_t variable name>, <register address and data>, <number of bytes to be written>, <slave address>, <repeated start>).
+
+
+
+
+
+
 ## user code
 
 ## debugging with ITM
@@ -178,7 +229,7 @@ And the result:
 
 ![image](https://user-images.githubusercontent.com/58916022/210245688-8ec5bdfc-9c4a-45ff-9cbe-aee54c23c92b.png)
 
-*Note: The difference between the programmed time and the readed time is because I leave the computer to do a different task, and later (29 minutes later) I returned to my desk and continued to debbuging*
+*Note: The difference between the programmed time and the read time is because I leave the computer to do a different task, and later (29 minutes later) I returned to my desk and continued with the debbuging*
 
 ## code in loop
 
