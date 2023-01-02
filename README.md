@@ -19,7 +19,7 @@ Create a BSP (board support package) to communicate with the RTC board (model Ti
 
 - The RAM registers are located in address locations 08h to 3Fh.
 
-Since the RTC uses BCD code, we need two functions. One to convert the binary number (integer) to its value in BCD format, so we can configure the initial time for RTC and another code to convert the readed BCD value to its decimal.
+Since the RTC uses BCD code, we need two functions. One to convert the binary number (integer) to its value in BCD format, so we can configure the initial time for RTC. The second code to convert the read BCD value to its decimal.
 
 The fist code is showed next (binary to BCD):
 
@@ -35,13 +35,13 @@ static uint8_t binary_to_bcd(uint8_t value){
 	return bcd;
 }
 ```
-The code above, receives a **value** with uint8_t type that represents a binary integer value (0 to 255). Then, if the value is less than 10, it just return the same value (in this case, binary value and bcd are the same). For values bigger than 10 we need to separe the digits and then convert the digits to hexadecimal.
+The code above, receives a **value** with uint8_t type that represents a binary integer value (0 to 255). Then, if the value is less than 10, it just return the same value (in this case, binary value and bcd are the same). For values bigger than 10 we need to separe the digits and then convert the digits to hexadecimal. Eg.: 15 is equal to 0x15.
 
 If the value is bigger (or equal to 10), **m** receives the decimal place (second order digit) of **value** by having **value** divided by 10. 
 
 Then **n** receives the remainder of the integer divission of **value** by 10. This is done by using the modulo operator (%). In **n** we have the first order digit separeted.
 
-Ten, **bcd**, that is a 8 bits value, receives in its most significant nibble the **m** value (m<<4) and **n** in its low significant nibble (|n). 
+Ten, **bcd**, that is a 8 bits value, receives in its most significant nibble the **m** value (m<<4) and **n** in its less significant nibble (|n). 
 
 Now the code for BCD to decimal:
 
@@ -54,17 +54,41 @@ static uint8_t bcd_to_binary(uint8_t value){
 	return binary;
 }
 ```
-To convert the bcd code to binary, we need to separed the most significant nibble (that represents the second order digit) from the less signficant nibble (that represents the first order digit).
+To convert the bcd code to binary, we need to separed the most significant nibble (that represents the second order digit or decimal place) from the less signficant nibble (that represents the first order digit).
 
-The **m** receveis the **value** after shiffted 4 positions, so the second order digit becomes a first order digit and then we multiply its result by 10. We have a real value that represents the second order digit digit.
+The **m** receveis the **value** after shiffted 4 positions, so the second order digit becomes a first order digit and then we multiply the result by 10. We have a real value that represents the second order digit digit.
 
-PAREI AQUI
+The **n** value does a mask of **value** with the less significant nibble, keeping the value on those bits and make as 0's the most significant nibble. This way, **n** keeps only the first order digit.
+
+To find the integer value (binary), it is just needed to sum **m** with **n**.
 
 Note tha both code are helper (local) functions of the bsp code for the ds1307 RTC. Both are declared at the top of the 'ds1307.c' file.
 
-## bsp code
+## bsp code, header file
 
+The source and header files of the bsp of the RTC (DS1307) are kept inside the created 'bsp' folder inside the project three, as showed next:
 
+![image](https://user-images.githubusercontent.com/58916022/210258759-42d6f60e-2ba6-48c5-ba74-1f4a3b6da7b4.png)
+
+In the header file (ds1307.h), we create the structs that will hold informations such as time and date. 
+
+![image](https://user-images.githubusercontent.com/58916022/210258900-81ac9269-4fce-40de-bb20-975f40b8d25f.png)
+
+We create some macros that would keep the register addresses, slave address and others.
+
+![image](https://user-images.githubusercontent.com/58916022/210259009-c5e8a9ee-ead4-4fd3-af22-db422689d29c.png)
+
+We create the function prototypes.
+
+![image](https://user-images.githubusercontent.com/58916022/210259066-9b1916d9-485a-4414-a200-99a27ab6ad86.png)
+
+And last, at the top of the document, we create the application configurable items:
+
+![image](https://user-images.githubusercontent.com/58916022/210259187-1245d748-7a0e-4876-9ea5-704229812bad.png)
+
+Those items, are the importantant #include's and #define's that will connect to others peripherals (and also how they are going to connect). We add the #include for the target microcontrolador and the #define's for the I2Cx channel, Port x, SDA and SCL pins, serial clock speed and also use of internal pull-up resistor.
+
+## bsp code, source file
 
 ## user code
 
